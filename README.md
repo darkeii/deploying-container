@@ -104,3 +104,24 @@ echo "deploy.sh" >> /opt/PROJECT_NAME/.gitignore
 #### NOTE: You can also setup, auto deploy on every push on github via generating a dedicated deploy key on VPS (I have not tried it yet).
 
 
+# Self notes
+```/opt``` is a Linux convention for "third-party applications that don't belong to the base OS", all the deployed projects can be accessed here. Separate from your ```home``` folder. It's owned by ```root``` by default, so ```mkdir``` needs ```sudo```. The ```chown``` line hands ownership to your own user so you don't need ```sudo``` for every command after this.
+
+
+```FROM nginx:alpine``` says "start from a tiny, pre-built Linux image that already has nginx installed" (Alpine is a minimal Linux distro, keeps the image small).
+```COPY . /usr/share/nginx/html``` copies your project's files into nginx's default folder for serving web pages inside that container.
+```EXPOSE 80``` documents that the container listens on port 80 internally.
+
+
+```docker build``` actually executes the Dockerfile's steps and produces a reusable image, tagged with a name (```-t```).
+```docker run``` starts an actual running container from that image: ```-d``` runs it in the background, ```--name``` gives it a friendly name for later reference, ```--restart unless-stopped``` means it auto-restarts if it crashes or the VPS reboots, and ```-p 127.0.0.1:PORT:80``` maps the container's internal port 80 to a specific port on the host — but only on 127.0.0.1 (localhost), meaning it's not reachable from the internet directly. That's intentional — only nginx should be the public-facing entry point.
+
+
+This tells the host's nginx: "when a request comes in for this specific domain, forward it to the container listening on that local port." The proxy_set_header lines pass along useful info (the real hostname, the visitor's real IP, etc.) to the container, since otherwise the container would just see nginx as the source of every request. ln -s (symlink) into sites-enabled is how nginx actually activates a config file — configs in ```sites-available``` alone don't do anything until linked.
+
+
+
+
+
+
+
