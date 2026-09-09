@@ -1,2 +1,14 @@
-# deploying-container
-documentation of deploying a container via docker
+**1. Create the project folder and clone the repo**
+
+sudo mkdir -p /opt/PROJECT_NAME
+sudo chown $USER:$USER /opt/PROJECT_NAME
+cd /opt/PROJECT_NAME
+git clone **<your-repo-url>**
+
+**2. Write the Dockerfile**
+
+
+
+
+
+
